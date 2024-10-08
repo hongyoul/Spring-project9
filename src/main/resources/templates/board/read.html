@@ -43,8 +43,7 @@
       <div class="card-body" id="commentdiv">
       </div>
       <div class="card-body">
-      <textarea class="form-control" id="commentContent" rows="3">
-      </textarea>
+      <textarea class="form-control" id="commentContent" rows="3"></textarea>
       <button type="button" class="btn btn-secondary" onclick="">댓글등록</button>
       </div>
       </div>
@@ -87,6 +86,9 @@
                  success: function(list) {
                     /* console.log(list); */
                     
+                    // div 초기화(자식 요소 모두 삭제)
+                     comment_div.innerHTML = '';
+                    
                     //리스트 안에 있는 요소를 하나씩 꺼내서 태그를 생성
                     for(comment of list){
                        /* console.log(comment); */
@@ -107,9 +109,16 @@
                              // 댓글 삭제 링크 생성
                              let deleteLink = document.createElement('a');
                              // 클릭 이벤트 설정
-                             deleteLink.href = '';
+                             // 링크 대신 클릭 이벤트로 처리
+                             deleteLink.href = '#';
+                             deleteLink.addEventListener('click', function(event) {
+                                 event.preventDefault(); // 링크 이동을 방지
+                                 removeComment(comment.commentNo);
+                              });
+                             
                              deleteLink.textContent = '삭제';
                              
+                             // 줄바꿈 태그 생성
                              let lineBreak = document.createElement('br');
 
                              comment_div.appendChild(writerSpan);
@@ -140,7 +149,35 @@
               }
               
               //AJAX를 호출하여 서버에 댓글 데이터 전송 + 등록 요청
+              $.ajax({
+            	  type:"POST",
+            	  url:"/comment/register",
+            	  data: dto,
+            	  success: function(newNo){
+            		  if(newNo){
+            			  // textarea 필드 초기화
+            			  commentContent.value = null;
+            			  // 기존 내용을 지우고 댓글 목록을 다시 출력
+            			  showComment();
+            		  }
+            	  }
+              });
               
+           }
+           
+           // 댓글 삭제 이벤트
+           function removeComment(commentNo){
+        	   
+        	 //AJAX로 댓글 삭제 요청
+        	 $.ajax({
+        		type:"DELETE",
+        		url:"/comment/remove?commentNo=" + commentNo,
+        		success: function(response){
+        			if(response){
+        				console.log(response);
+        			}
+        		}
+        	 });
            }
            
            

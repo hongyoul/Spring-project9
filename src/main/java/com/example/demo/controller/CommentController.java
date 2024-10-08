@@ -30,14 +30,19 @@ public class CommentController {
 	}
 	
 	@PostMapping("/register")
-	public Boolean register(CommentDTO dto) {
+	public int register(CommentDTO dto) {
+		
 		// 임시 아이디. 시큐리티 배운 후에 변경해야함.
-		String id = "user1"; 
-		dto.setWriter(id);
-		// 새로운 댓글 등록
-		service.register(dto);
+//		String id = "user1"; 
+		
+		// 스프링 시큐리티를 처리하기 전까지는 임시 아이디 사용
+		dto.setWriter("user1");
+		
+		// 데이블에 새로운 댓글 등록(저장)
+		int newNo = service.register(dto);
+		
 		// 처리결과 반환
-		return true;
+		return newNo;
 	}
 	
 	@DeleteMapping("/remove")
